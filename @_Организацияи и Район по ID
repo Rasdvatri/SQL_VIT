@@ -1,0 +1,22 @@
+select t1.organization_id,
+       case when t1.name like 'мТОиР%' or t1.name like 'мТ_Ст%'
+         then substr(t1.name,7) 
+           when t1.name like 'ТОиР_%'
+             then substr(t1.name,6)
+           else t1.name end child_name,
+       t3.organization_id,
+       case when t3.name like 'мТОиР%' or t3.name like 'мТ_Ст%'
+         then substr(t3.name,7) 
+           when t3.name like 'ТОиР_%'
+             then substr(t3.name,6)
+           else t3.name end           parent_name
+  from hr.hr_all_organization_units t1
+       left join HR.PER_ORG_STRUCTURE_ELEMENTS t2 
+            on t2.organization_id_child = t1.organization_id
+       left join hr.hr_all_organization_units t3 
+            on t3.organization_id = t2.organization_id_parent
+ where t1.date_to is null and
+       t3.attribute_category is null /*and
+       t1.organization_id = 775            --*/
+order by t1.organization_id
+;
