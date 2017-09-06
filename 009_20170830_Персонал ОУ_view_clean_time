@@ -1,0 +1,142 @@
+select case when t.start_time     between x.start_time and x.end_time
+             and t.end_time       between x.start_time and x.end_time
+         then 0
+           
+            when t.start_time not between x.start_time and x.end_time 
+             and t.end_time   not between x.start_time and x.end_time 
+         then t.fact_time-x.fact_time 
+           
+            when t.start_time = x.start_time
+             and t.end_time   not between x.start_time and x.end_time
+         then t.fact_time-x.fact_time
+           
+            when t.end_time   = x.end_time
+             and t.start_time not between x.start_time and x.end_time
+         then t.fact_time-x.fact_time
+            
+            when t.start_time != x.start_time 
+             and t.start_time     between x.start_time and x.end_time 
+             and t.end_time   not between x.start_time and x.end_time 
+         then t.fact_time-(x.end_time-t.start_time)*24
+           
+            when t.end_time   != x.end_time
+             and t.start_time not between x.start_time and x.end_time 
+             and t.end_time       between x.start_time and x.end_time 
+         then t.fact_time-(t.end_time-x.start_time)*24
+           
+            end as clean_time
+                       
+       , t.fact_time  as fact_time
+       , x.fact_time  as dinner_time
+       , t.start_time as t_st
+       , t.end_time   as t_et
+       , x.start_time as x_st
+       , x.end_time   as x_et
+       , t.order_set_id
+       , t.wip_entity_id
+       , t.person_id
+       , x.type_work  
+       , x.organization_id
+  from (
+        select x.order_set_id,
+               x.wip_entity_id,
+               x.resource_id,
+               x.tech_code, 
+               x.start_time,
+               (trunc(x.start_time)+1)-1/86400             as end_time,
+               (((trunc(x.start_time)+1)-x.start_time)*24) as fact_time,
+               x.person_id,
+               x.department_id,
+               x.special_condition,
+               x.added_from_nz,
+               x.created_by,
+               x.creation_date,
+               x.last_updated_by,
+               x.last_update_date,
+               x.employeer_code
+          from xxwr_orders_res_inctances x
+         where trunc(x.start_time) != trunc(x.end_time-1/86400) and
+               x.tech_code is null and
+               x.added_from_nz = 0
+        union all
+        select t.order_set_id,
+               t.wip_entity_id,
+               t.resource_id, 
+               t.tech_code, 
+               trunc(t.end_time)                           as start_time,
+               t.end_time,
+               (t.end_time-trunc(t.end_time))*24           as fact_time,
+               t.person_id,
+               t.department_id,
+               t.special_condition,
+               t.added_from_nz,
+               t.created_by,
+               t.creation_date,
+               t.last_updated_by,
+               t.last_update_date,
+               t.employeer_code
+          from xxwr_orders_res_inctances t
+         where trunc(t.start_time) != trunc(t.end_time-1/86400) and
+               t.tech_code is null and
+               t.added_from_nz = 0
+        union all
+        select s.order_set_id,
+               s.wip_entity_id,
+               s.resource_id,
+               s.tech_code,
+               s.start_time,
+               s.end_time,
+               s.fact_time,
+               s.person_id,
+               s.department_id,
+               s.special_condition,
+               s.added_from_nz,
+               s.created_by,
+               s.creation_date,
+               s.last_updated_by,
+               s.last_update_date,
+               s.employeer_code
+          from xxwr_orders_res_inctances s
+         where (trunc(s.start_time) = trunc(s.end_time-1/86400)) and
+               s.tech_code is null and
+               s.added_from_nz = 0
+        ) t,
+       (
+        select x1.type_work,
+               x1.organization_id,
+               x1.order_set_id,
+               x1.wip_entity_id,
+               x1.start_time,
+               (trunc(x1.start_time)+1)-1/86400            as end_time,
+               ((trunc(x1.start_time)+1)-x1.start_time)*24 as fact_time
+          from xxwr_005_wo_load_trip x1
+         where trunc(x1.start_time) != trunc(x1.end_time) and 
+               x1.type_work = 'ќбед'
+        union all
+        select x2.type_work,
+               x2.organization_id,
+               x2.order_set_id,
+               x2.wip_entity_id,
+               trunc(x2.end_time)                          as start_time,
+               x2.end_time,
+               (x2.end_time-trunc(x2.end_time))*24         as fact_time
+          from xxwr_005_wo_load_trip x2
+         where trunc(x2.start_time) != trunc(x2.end_time) and 
+               x2.type_work = 'ќбед'
+        union all
+        select x3.type_work,
+               x3.organization_id,
+               x3.order_set_id,
+               x3.wip_entity_id,
+               x3.start_time,
+               x3.end_time,
+               x3.fact_time
+          from xxwr_005_wo_load_trip x3
+         where trunc(x3.start_time) = trunc(x3.end_time) and 
+               x3.type_work = 'ќбед'
+        ) x 
+ where(x.start_time    between t.start_time         and t.end_time-1/86400  or
+       x.end_time      between t.start_time+1/86400 and t.end_time)         and
+       t.order_set_id  = x.order_set_id                                     and
+       t.wip_entity_id != x.wip_entity_id
+       --and x.order_set_id = 179270
