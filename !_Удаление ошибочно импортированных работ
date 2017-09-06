@@ -1,0 +1,24 @@
+---DEL
+select t.rowid, t.* from WIP.WIP_DISCRETE_JOBS t
+where trunc(t.creation_date) = '29.8.2017'
+  and t.attribute13 = 912
+
+;
+
+select t.rowid, t.* 
+from WIP.WIP_ENTITIES t,
+     wip.wip_discrete_jobs w
+where t.wip_entity_id = w.wip_entity_id
+  and trunc(w.creation_date) = '29.8.2017'
+  and w.attribute13 = 912
+
+;
+
+select t.rowid, t.* 
+from EAM.EAM_WORK_ORDER_DETAILS t,
+     wip.wip_discrete_jobs w
+where t.wip_entity_id = w.wip_entity_id
+  and trunc(w.creation_date) = '29.8.2017'
+  and w.attribute13 = 912
+
+;
