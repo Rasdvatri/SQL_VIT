@@ -1,0 +1,58 @@
+select substr(ood.ORGANIZATION_NAME, 7) as "orgName",
+       bdv.DEPARTMENT_CODE              as "Участок",
+       bdv.DESCRIPTION                  as "Биригада",
+       xos.order_set_id                 as "НомерНЗ",
+       dri.FULL_NAME                    as "ФИО",
+       dri.ATTRIBUTE_CATEGORY           as "*Должность",
+       dri.ATTRIBUTE1                   as "*УточнДолжн",
+       xorp.FACT_TIME                   as "ФактРабот",
+       xnv.asset_activity               as "Работа",
+       case when xorp.SPECIAL_CONDITION = 1 then 'ОУ' else '-' end as "Особые условия",
+       decode (xot.special_condition_cat, '7', '[7] Работы в емкостных сооружениях',
+                                          '2', '[2] Работы в колодцах по замене ПГ',
+                                          '4', '[4] Работы на сетях с пневмоинстр',
+                                          '6', '[6] Работы на сетях с водоотлив. тех.',
+                                          '5', '[5] Работы на проезжей части дороги',
+                                          '1', '[1] Земляные работы') as "КодОУ",
+       xorp.start_time                  as "Начало работы",
+       xorp.end_time                    as "Окончание работы",
+       xnv.address                      as "Адрес"/*,
+       ood.ORGANIZATION_ID              as "*orgID",
+       xot.wip_entity_id                as "*IDработы",
+       ood.ORGANIZATION_CODE            as "*orgCode",
+       bdv.DEPARTMENT_ID                as "*IDбригады",
+       dri.EMPLOYEE_NUMBER              as "*табНомер",
+       pap.person_id                    as "*IDработника",
+       pap.party_id                     as "*допIDработника",
+       xnv.DOC_SOURCE                   as "*ВидРаботы",
+       xot.special_condition_cat        as "*КодОУ",
+       xorp.SPECIAL_CONDITION           as "*ДубльОУ"*/
+
+  from org_organization_definitions     ood,          --Организации
+       bom_departments_v                bdv,          --Бригады
+       BOM_DEPT_RES_INSTANCES_EMP_V     dri,          --Люди в бригадах, с должностными назначениями
+       HR.PER_ALL_PEOPLE_F              pap,          --ФИО, Person_ID, Таб.номер
+       xxwr_order_sets                  xos,          --Перечень наряд-заданий
+       xxwr_order_tasks                 xot,          --Рабты в наряд-задании
+       xxwr_005_orders_res_people_v     xorp,         --Работы, распределенные по людям бригады. исключены не распределенные
+       XXWR_005_NZ_V                    xnv           --Все работы перечисленные НЗ, не зависимо от распределения по людям
+              
+ where /*ood.ORGANIZATION_id = 775        --782                                      --Переменная организация персонала
+   and*/ bdv.ORGANIZATION_ID = ood.ORGANIZATION_id
+   and bdv.DISABLE_DATE is null
+--   and bdv.DEPARTMENT_ID = 141019                                                  --Переменная Бригада
+   and bdv.DEPARTMENT_ID = dri.DEPARTMENT_ID
+   and pap.employee_number = dri.employee_number
+   and nvl(dri.effective_end_date, xos.order_set_date) >= xos.order_set_date         --Исключение задвоения работников, если менял фамилию
+   and xos.department_id = bdv.DEPARTMENT_ID
+   and xos.order_set_id = '159370'                    --тестовый фильтр
+--   and trunc(xos.start_time) between '1.5.2017' and '31.5.2017'                    --Переменная период
+   and xot.order_set_id  = xos.order_set_id
+   and xorp.ORDER_SET_ID = xos.order_set_id
+   and xorp.wip_entity_id = xot.wip_entity_id
+--   and pap.person_id = 1441                         --тестовый фильтр
+   and xorp.PERSON_ID = pap.person_id
+   and xnv.order_set_id = xos.order_set_id
+   and xnv.wip_entity_id = xot.wip_entity_id
+
+ order by ood.ORGANIZATION_ID, bdv.DEPARTMENT_ID, pap.person_id, dri.FULL_NAMe, xorp.START_TIME, xot.wip_entity_id
