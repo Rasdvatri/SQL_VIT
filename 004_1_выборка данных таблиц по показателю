@@ -1,0 +1,79 @@
+select --sum(t.eo_length) as "шт/м.",
+       --sum(wb.xxwr_get_wip_entity_time2(xot.wip_entity_id)) as "ч-ч"
+--       ,
+       t.eo_length as "шт/м."
+       ,
+       wb.xxwr_get_wip_entity_time2(xot.wip_entity_id) as "ч-ч"
+       ,
+       s1.seq_num, dd.description, dd.department_id, trunc(xot.end_time - 1/86400) , xot.wip_entity_id
+from xxwr_502_wo_eo                t, 
+     xxwr_order_tasks              xot,
+     xxwr_order_sets               xos,
+     wip_discrete_jobs             wdj,
+     bom_departments               dd,
+     org_organization_definitions  od,
+     (select * from xxwr_502_wo_routing_v where ACTIVE_FLAG = 1 ) wr,
+     (
+                                   SELECT t3.asset_activity_id, t2.seq_num, t3.action_seq_id, t3.eo_type
+                                     FROM xxwr_work_akt_item_eo_prop t3,
+                                          (SELECT * FROM TABLE(XXWR_WORK_AKT_REPORT_PKG.get_wa_items('VO_EPP_UOR'))) t2--,
+                                    where t3.report_cd(+) = 'VO_EPP_UOR' 
+                                      and  t3.parent_item_cd(+) || t3.wa_item_cd(+) =  t2.parent_item_cd || t2.wa_item_cd
+                                      and t2.wa_item_number = '5' 
+                                                ) s1
+where t.wip_entity_id = xot.wip_entity_id
+      and xot.order_set_id = xos.order_set_id
+      and trunc(xot.end_time - 1/86400) between '1.05.2017' and '31.05.2017'
+      and xos.organization_id = 1576
+--      and dd.department_id = 130027
+      and xot.wip_entity_id = wdj.wip_entity_id
+      and nvl(wdj.attribute9, 'Y') = 'Y'
+      and xos.affirmed in (1, 2)
+      and xos.department_id = dd.department_id 
+      and xos.organization_id = od.ORGANIZATION_ID
+--      and wdj.attribute7 = 'ПП'
+      and t.eo_type = nvl (s1.eo_type, t.eo_type)
+      and xot.wip_entity_id = nvl(wr.WIP_ENTITY_ID, xot.wip_entity_id)
+      and s1.action_seq_id = wr.operation_item_id(+)
+      and s1.asset_activity_id = wr.action_seq_id(+)
+      and wdj.primary_item_id = s1.asset_activity_id
+group by  t.eo_length, wb.xxwr_get_wip_entity_time2(xot.wip_entity_id)  , s1.seq_num , dd.description, dd.department_id  , trunc(xot.end_time - 1/86400), xot.wip_entity_id
+
+
+/*select sum(t.eo_length) as "шт/м." , 
+       sum(wb.xxwr_get_wip_entity_time2(xot.wip_entity_id))  as "ч-ч",
+       s1.seq_num, dd.description, trunc(xot.end_time - 1/86400) , 
+       'A'
+from xxwr_502_wo_eo t, 
+     xxwr_order_tasks xot,
+     xxwr_order_sets xos,
+     wip_discrete_jobs wdj,
+     bom_departments dd,
+     org_organization_definitions od,
+     (select * from xxwr_502_wo_routing_v where ACTIVE_FLAG = 1 ) wr,
+     (
+                                   SELECT t3.asset_activity_id, t2.seq_num
+                                     FROM xxwr_work_akt_item_eo_prop t3,
+                                          (SELECT * FROM TABLE(XXWR_WORK_AKT_REPORT_PKG.get_wa_items('VO_EPP'))) t2
+                                    where t3.report_cd(+) = 'VO_EPP' 
+                                      and  t3.parent_item_cd(+) || t3.wa_item_cd(+) =  t2.parent_item_cd || t2.wa_item_cd
+                                      and t2.wa_item_number = '3.2.' 
+                                                ) s1
+where t.wip_entity_id = xot.wip_entity_id
+      and xot.order_set_id = xos.order_set_id
+      and trunc(xot.end_time - 1/86400) between '01.05.2017' and '31.05.2017'
+      and xos.organization_id = 842
+--      and substr(od.ORGANIZATION_NAME, 7) = 'РК Колпино'
+      and wdj.wip_entity_id = xot.wip_entity_id
+      and nvl(wdj.attribute9, 'Y') = 'Y'
+      and xos.affirmed in (1, 2)
+      and dd.department_id = xos.department_id
+      and od.ORGANIZATION_ID = xos.organization_id
+      and wdj.attribute7 = 'ПП'
+      and t.eo_type = nvl (s1.eo_type, t.eo_type)
+--      and xot.wip_entity_id = nvl(wr.WIP_ENTITY_ID, xot.wip_entity_id)
+      and s1.action_seq_id = wr.operation_item_id(+)
+      and s1.asset_activity_id = wr.action_seq_id(+)
+      and wdj.primary_item_id  = s1.asset_activity_id
+      --and dd.description = 'ЛИН 1_Козлова М.С.'
+group by s1.seq_num , 'A'    , dd.description  , trunc(xot.end_time - 1/86400) */
