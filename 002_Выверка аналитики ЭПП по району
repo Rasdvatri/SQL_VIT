@@ -1,0 +1,64 @@
+/*
+select 
+        distinct(t.seq_num) 
+
+       , (select sum(t2.fact_value)
+         from WB.XXWR_BI_FCT_EPP_PF_NEW t2
+         where t2.seq_num = t.seq_num
+         and t2.organization_id = t.organization_id
+         and t2.department_id = t.department_id
+         and t2.ondate between '01.05.2017' and '31.05.2017'
+         ) as totalFV
+
+       , (select sum(t3.fact_time)
+         from WB.XXWR_BI_FCT_EPP_PF_NEW t3
+         where t3.seq_num = t.seq_num
+         and t3.organization_id = t.organization_id
+         and t3.department_id = t.department_id
+         and t3.ondate between '01.05.2017' and '31.05.2017'
+         ) as totalft
+        
+       , bbd.description 
+       , ood.ORGANIZATION_NAME  --*/
+               
+select bbd.description, ood.ORGANIZATION_NAME, t.ondate, t.seq_num, t.fact_value, t.fact_time, t.doc_source
+
+--select *
+--/*
+
+from   WB.XXWR_BI_FCT_EPP_PF_NEW     t
+     , org_organization_definitions  ood
+     , BOM.BOM_DEPARTMENTS           bbd
+where t.organization_id = 1574       --in (845, 844,  846, 1574, 1576, 1627, 1628, 1629, 1630) --= 842
+--and t.department_id = 34028 --or  t.department_id = 134022)
+and t.ondate between '01.01.2017' and '30.06.2017'
+and t.seq_num = 296 
+--and t.seq_num >= 2 and t.seq_num <= 16
+and t.organization_id = ood.ORGANIZATION_ID
+and t.department_id = bbd.department_id
+and t.doc_source = 'ПП'
+
+order by --t.creation_date, 
+         ood.ORGANIZATION_NAME
+--         , bbd.description
+         , t.seq_num asc     --*/
+
+
+/*
+select distinct t.organization_id, ood.ORGANIZATION_CODE, ood.ORGANIZATION_NAME
+from WB.XXWR_BI_FCT_EPP_PF_NEW t, org_organization_definitions ood
+where t.organization_id = ood.ORGANIZATION_ID
+order by t.organization_id        --*/
+
+/*
+select ood.organization_id, ood.ORGANIZATION_CODE "ТерКод", ood.ORGANIZATION_NAME "Организация", bbd.description "Бригада", bbd.department_id "ID_Бригады", bbd.department_code "Код Бригады", bbd.disable_date "Закрыта"
+  from org_organization_definitions ood, BOM.BOM_DEPARTMENTS bbd
+ where ood.ORGANIZATION_CODE = '604'       -- like '%11' --Задать код территории
+--       (ood.ORGANIZATION_CODE = '501'
+--       or ood.ORGANIZATION_CODE = '711'
+--       or ood.ORGANIZATION_CODE like '6%') -- выборка по нескольким терр.кодам 
+										                       --(перед использование закоментировать предыдущий фильтр)
+       and ood.ORGANIZATION_ID = bbd.organization_id
+       and bbd.disable_date is null
+ order by ood.ORGANIZATION_CODE, 
+          bbd.department_id      --*/
