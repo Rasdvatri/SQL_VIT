@@ -1,0 +1,15 @@
+select --sum(t.fact_value), sum(t.fact_time), 
+       t.fact_value, t.fact_time,
+       t.seq_num , 'B', bbd.description, bbd.department_id, t.ondate
+from   WB.XXWR_BI_FCT_EPP_PF_NEW     t
+     , org_organization_definitions  ood
+     , BOM.BOM_DEPARTMENTS           bbd
+where t.organization_id = 1629
+--and (t.seq_num = 31 or t.seq_num = 24)
+and t.seq_num = 477
+and t.ondate between '1.05.2017' and '31.05.2017'
+--and t.doc_source = 'ПП'
+and t.organization_id = ood.ORGANIZATION_ID
+and t.department_id = bbd.department_id
+--and bbd.department_id = 130027
+--group by t.seq_num, 'B' , bbd.description , bbd.department_id, t.ondate
