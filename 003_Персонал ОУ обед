@@ -1,0 +1,14 @@
+SELECT TYPE_WORK,
+       fact_time,
+       start_time,
+       END_TIME,
+       ORDER_SET_ID,
+       WIP_ENTITY_ID,
+       attribute11
+  FROM xxwr_005_wo_load_trip 
+ WHERE organization_id = '782'
+   and order_set_id = '152538'
+   and type_work in ('Обед', 'Погр-разгр')
+--   and (ORGANIZATION_ID = '782')
+--   and (ORDER_SET_ID = '152538')
+ order by decode(type_work, 'Обед', 0, 1), START_TIME nulls first
