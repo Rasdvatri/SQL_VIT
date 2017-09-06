@@ -1,0 +1,33 @@
+select * from WB.WB_BI_LIST_USERS t 
+where t.user_id like 'STEPANY%' 
+   or t.user_id like 'ABDUL%'  --*/
+
+/*
+select t.rowid, t.* from WB.WB_BI_LIST_USERS t --*/
+
+
+/*insert into WB.WB_BI_LIST_USERS t 
+      (t.user_id,
+       t.user_pwd,
+       t.user_group,
+       t.user_display,
+       t.user_name,
+       t.user_fullname,
+       --t.user_group_new,
+       t.user_group_eam,
+       --t.user_group_ip,
+       --t.user_group_eam_sec,
+       --t.user_group_ip_sec,
+       --t.user_group_wb,
+       t.user_group_wb_sec,
+       t.user_group_hierarchy_org)
+values
+      ('BARYSCHUK_NP',
+       12345,
+       'none',
+       'Нина Петровна',
+       'Барыщук Н.П.',
+       'Барыщук Нина Петровна',
+       'EAM_WS_NT',
+       3,
+       '865;1591'); --*/
