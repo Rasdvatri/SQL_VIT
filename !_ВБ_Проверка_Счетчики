@@ -1,0 +1,23 @@
+select t.segment1,
+       t.description,
+       t.attribute1         "є —четчика",
+       t.attribute2         " “",
+       t.attribute3         "‘т—утки",
+       t.attribute5         " тѕотери",
+       t.attribute7         "ѕрѕоз",
+       t.attribute9         "–асч–асх",
+       m.segment1           "num_par",
+       m.description        "descr_par",
+       t.attribute13,
+       t.attribute25        "“ип”чета",
+       t.inventory_item_id,
+       t.organization_id
+  from mtl_system_items t 
+       left join mtl_system_items m on m.inventory_item_id = t.attribute12 and 
+                                       m.organization_id = t.organization_id
+ where t.organization_id != 83 and
+       t.segment1 like '01.910.14%'
+--   and t.description like '%ƒибуны%'
+   and t.created_by = 8327
+
+ order by t.segment1
