@@ -1,0 +1,6 @@
+/*****************
+Виды работ
+*****************/
+select * from MTL_SYSTEM_ITEMS_VL t
+where t.ORGANIZATION_ID = 83
+      and t.SEGMENT1 like 'В%'
