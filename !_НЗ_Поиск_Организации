@@ -1,0 +1,10 @@
+/*****************************************************
+Выборка организаций: территорий, сетей, станций и т.п
+******************************************************/
+
+select t.ORGANIZATION_ID, t.ORGANIZATION_CODE, t.ORGANIZATION_NAME
+from org_organization_definitions t
+--where t.ORGANIZATION_NAME like '%РК Пригор%'
+where t.ORGANIZATION_ID like '774%'
+--where t.ORGANIZATION_CODE like '434%'
+order by t.ORGANIZATION_CODE
