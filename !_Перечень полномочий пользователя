@@ -1,0 +1,14 @@
+select t.user_name,
+       x.RESPONSIBILITY_ID,
+       r.responsibility_name,
+       x.RESPONSIBILITY_APPLICATION_ID,
+       x.END_DATE
+  from fnd_user_resp_groups_direct x,
+       fnd_user t,
+       fnd_responsibility_tl r
+ where t.user_name = 'OGOL_EE' and
+       x.END_DATE is null and
+       t.user_id = x.user_id and
+       r.responsibility_id = x.RESPONSIBILITY_ID and
+       r.language = 'RU'
+ order by x.RESPONSIBILITY_ID
