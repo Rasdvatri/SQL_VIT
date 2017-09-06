@@ -1,0 +1,40 @@
+SELECT ood.ORGANIZATION_ID   "ID Организации"       ,
+       ood.ORGANIZATION_CODE "Код Организации"      ,
+       ood.ORGANIZATION_NAME "Станции/Сети"         ,
+       b.DEPARTMENT_CODE     "Код Отдела"           ,
+       b.DESCRIPTION         "Нименование Отдела"   ,
+       b.DISABLE_DATE                               ,
+       rr.resource_code      "Должность"            ,
+       t.ATTRIBUTE1          "Уточнение К Должности",
+       t.EMPLOYEE_NUMBER     "Табельный Номер"      ,
+       t.FULL_NAME           "ФИО Сотрудника"       --,
+--       t.SERIAL_NUMBER                              ,        
+--       t.INSTANCE_ID                                ,
+--       t.DEPARTMENT_ID                              ,
+--       t.RESOURCE_ID                                ,
+--       t.LAST_UPDATE_DATE                           , 
+--       t.LAST_UPDATED_BY                            ,
+--       t.CREATION_DATE                              ,
+--       t.CREATED_BY                                 --, 
+  FROM BOM_DEPT_RES_INSTANCES_EMP_V t  ,
+       bom_departments_v            b  ,
+       org_organization_definitions ood,
+       BOM_RESOURCES_V              rr
+ WHERE trunc(sysdate) between trunc(effective_start_date) and
+       trunc(effective_end_date)
+--       and (DEPARTMENT_ID = '58033')
+--       and (RESOURCE_ID = '25023')
+       and ood.ORGANIZATION_ID = rr.organization_id
+       and t.RESOURCE_ID = rr.resource_id
+       and t.DEPARTMENT_ID = b.DEPARTMENT_ID
+       and b.ORGANIZATION_ID = ood.ORGANIZATION_ID
+--       and t.EMPLOYEE_NUMBER = 952
+       and FULL_NAME like '%Петров Денис Ю%%%'
+       and ood.ORGANIZATION_CODE /*= '501'*/ like '%'
+--       and b.DESCRIPTION not like '%*'
+       and b.DISABLE_DATE is /*not*/ NULL
+--       and ood.ORGANIZATION_CODE != '699'
+ order by ood.ORGANIZATION_CODE,
+          b.DESCRIPTION,
+          rr.resource_code,
+          to_number(t.EMPLOYEE_NUMBER) ASC
