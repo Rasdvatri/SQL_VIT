@@ -1,0 +1,23 @@
+/******************************************************************
+Выборка наименований бригад по коду территории организации персонала
+*******************************************************************/
+select ood.organization_id,
+       ood.ORGANIZATION_CODE "ТерКод",
+       ood.ORGANIZATION_NAME "Организация",
+       bbd.description       "Бригада",
+       bbd.department_id     "ID_Бригады",
+       bbd.department_code   "Код Бригады",
+       bbd.disable_date      "Закрыта"
+  from org_organization_definitions ood, 
+       BOM.BOM_DEPARTMENTS bbd
+ where bbd.description like '%Линько%' 
+--       ood.ORGANIZATION_CODE = '701'       -- like '%11' --Задать код территории*/
+--       bbd.department_id = 141019
+       /*(ood.ORGANIZATION_CODE = '501'
+       or ood.ORGANIZATION_CODE = '711'
+       or ood.ORGANIZATION_CODE like '6%') -- выборка по нескольким терр.кодам 
+										                       --(перед использование закоментировать предыдущий фильтр)*/
+       and ood.ORGANIZATION_ID = bbd.organization_id
+--       and bbd.disable_date is null
+ order by ood.ORGANIZATION_CODE, 
+          bbd.department_id

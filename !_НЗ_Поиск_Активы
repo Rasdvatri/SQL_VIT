@@ -1,0 +1,5 @@
+SELECT t.serial_number, t.inv_organization_code, t.attribute4 as inv_num, t.descriptive_text as activ_name, t.instance_number, t.area
+  FROM MTL_EAM_ASSET_NUMBERS_ALL_V t
+ where t.descriptive_text like '%2552%%%'
+       --t.attribute4 like '%инв%'
+order by t.descriptive_text
