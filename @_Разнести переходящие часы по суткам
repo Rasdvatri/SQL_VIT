@@ -1,0 +1,23 @@
+select x.order_set_id,
+       x.wip_entity_id,
+       x.start_time                                                         as start_time,
+       case when trunc(x.start_time) != trunc(x.end_time-1/86400)
+         then trunc(x.end_time)-1/86400 
+           end                                                              as end_time_to,
+       case when trunc(x.start_time) != trunc(x.end_time-1/86400)
+         then trunc(x.end_time) 
+           end                                                              as start_time_past,
+       x.end_time                                                           as end_time,
+       case when trunc(x.start_time) != trunc(x.end_time-1/86400)
+         then (((trunc(x.start_time)+1)-x.start_time)*24)
+           end                                                              as time_to,
+       case when trunc(x.start_time) != trunc(x.end_time-1/86400)
+         then (x.end_time-trunc(x.end_time))*24
+           end                                                              as time_past,
+       case when trunc(x.start_time) != trunc(x.end_time-1/86400)
+         then null 
+           else x.fact_time end                                             as fact_time,
+       x.special_condition
+  from xxwr_order_tasks x
+ where x.order_set_id = 162462
+-- where x.end_time between '1.6.2017' and '5.6.2017'
