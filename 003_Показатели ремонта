@@ -1,0 +1,25 @@
+SELECT t2.seq_num, t2.wa_item_number, t2.wa_item_text,
+       (select rpad(smi.ATTRIBUTE2, 10)|| smi.DESCRIPTION 
+          from mtl_system_items_vl smi 
+         where smi.INVENTORY_ITEM_ID = t.asset_activity_id 
+           and smi.ORGANIZATION_ID = 83
+           ) as kind_of_work,
+       (select bv.operation_description from bom_operation_sequences_v bv where bv.operation_sequence_id = t.action_seq_id ) as operation_description_,
+       T.*, t.rowid
+  FROM xxwr_work_akt_item_eo_prop t,
+       (SELECT * FROM TABLE(XXWR_WORK_AKT_REPORT_PKG.get_wa_items('VO_EPP'))) t2
+where 
+(
+t.report_cd(+) = 'VO_EPP' and
+       t.parent_item_cd(+) || t.wa_item_cd(+) =
+       t2.parent_item_cd || t2.wa_item_cd
+--       and t2.wa_item_number is not null
+     and t2.seq_num > = 2
+--      and t.eo_type is null
+--and t2.seq_num <= 447
+
+--and ( t.NSI_DIAM is null and t.EO_MAT_TYPE is null and t.EO_TYPE is null and t.ASSET_ACTIVITY_ID is not null)
+)
+/*and
+(wa_item_number = '3.2.')*/
+order by t2.seq_num
