@@ -1,0 +1,23 @@
+select t.item_no,
+       t.item_descr,
+       t.load_date,
+       t.energy_calc,
+       t.load_set_id,
+       t.org_id,
+       t.item_id,
+       t.trans_koeff,
+       t.indication,
+       t.status,
+       t.result_batch_id,
+       t.result_actual_qty,
+       t.creation_date,
+       t.created_by,
+       t.last_updated_by,
+       t.last_update_date,
+       t.last_update_login,
+       t.percent_lost,
+       t.active,
+       t.used_for_item_calc
+ from WB.WB_EE_FACT_LOAD_DATA t
+where t.item_no = '01.840.1219'
+order by t.load_date desc
