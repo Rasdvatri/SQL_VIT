@@ -1,0 +1,35 @@
+select t.order_set_id      order_id,
+       t.order_set_date    order_date,
+       o.ORGANIZATION_CODE org_c,
+       b.description       brigada,
+       p.FULL_NAME         FIO,
+       x.start_time,
+       x.end_time,
+       x.fact_time,
+       x.special_condition OU,
+       w.description       rabota,
+       d.person_id         pid,
+       d.employeer_code    tabn,
+       o.ORGANIZATION_NAME
+       
+  from xxwr_order_sets              t,
+       xxwr_order_tasks             x,
+       wip_discrete_jobs            w,
+       xxwr_order_set_res_inctances d,
+       org_organization_definitions o,
+       bom_departments              b,
+       (select distinct v.EMPLOYEE_NUMBER, v.FULL_NAME 
+          from BOM_DEPT_RES_INSTANCES_EMP_V v) p
+       
+ where x.order_set_id    = t.order_set_id    and
+       w.wip_entity_id   = x.wip_entity_id   and
+       b.department_id   = t.department_id   and
+       o.ORGANIZATION_ID = t.organization_id and
+       d.order_set_id    = t.order_set_id    and
+       d.tech_code       is null             and
+       p.EMPLOYEE_NUMBER = d.employeer_code
+
+   and t.order_set_id    = 186958            --in (160563/*160072, 159974, 160562*/)
+--   and x.special_condition = 1
+
+ order by t.order_set_id, p.FULL_NAME, x.start_time
