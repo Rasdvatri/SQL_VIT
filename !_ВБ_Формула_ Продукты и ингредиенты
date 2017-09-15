@@ -1,0 +1,56 @@
+select t.FORMULA_NO,
+       t.FORMULA_DESC1 "Описание",
+       x.line_type,
+       x.segment1,
+       x.description,
+       x.qty,
+       x.attribute_category categ_prod,
+       t.FORMULA_VERS,
+       t.FORMULA_ID,
+       t.ATTRIBUTE1,
+       t.ATTRIBUTE_CATEGORY categ_form,
+       t.LAST_UPDATE_DATE,
+       t.LAST_UPDATED_BY,
+       t.FORMULA_STATUS,
+       t.OWNER_ID,
+       t.OWNER_ORGANIZATION_ID
+  from FM_FORM_MST t
+  left join(
+            select s.formula_id,
+                   v.segment1,
+                   v.description,
+                   s.qty,
+                   s.inventory_item_id,
+                   v.attribute_category,
+                   decode(s.line_type, -1, 'Ингредиент',
+                                        1, 'Продукт',
+                                        2, 'Побочный продукт',
+                                           'Тип не определен') line_type--*/ case when s.line_type = '-1' then 'Ингредиент' when s.line_type = '1' then 'Продукт' when s.line_type = '2' then 'Побочный продукт' else 'Тип не определен' end as line_type --*/
+              from FM_MATL_DTL s,
+                   mtl_system_items v
+             where v.inventory_item_id = s.inventory_item_id and 
+                   v.organization_id = s.organization_id
+                                                             ) x on x.formula_id = t.FORMULA_ID
+ where t.ATTRIBUTE_CATEGORY = 'WB_OPM'
+       and t.OWNER_ORGANIZATION_ID = 82 
+       and t.FORMULA_NO = '221-01.310.1161-05.2013'
+--       and x.segment1 like '01.820.%' --*/ in ('01.840.1219')
+
+/*;
+select s.formula_id,
+       v.segment1,
+       v.description,
+       s.qty,
+       s.inventory_item_id,
+       v.attribute_category,
+       s.line_no,
+       s.line_type
+  from FM_MATL_DTL s,
+       mtl_system_items v
+ where s.formula_id = 17462 and
+       v.inventory_item_id = s.inventory_item_id and
+       v.organization_id = s.organization_id
+/*;
+select *
+  from mtl_system_items t
+ where t.inventory_item_id in (40204, 155, 169132)--*/
