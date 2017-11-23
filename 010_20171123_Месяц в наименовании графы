@@ -1,0 +1,93 @@
+--ГОД, Квартал, Месяц, В значениях граф месяцев - количество дней
+select * 
+  from (
+        select t.year_num, 
+               t.quarter_num,
+               t.month_num, 
+               t.MONTH_NAME
+          from wb.xxwr_bi_dim_time_v t
+        where t.year_num    is not null and
+              t.quarter_num is not null and
+              t.month_num   is not null and
+              t.week_num    is not null and
+              t.DAY_CODE    is not null
+        )
+pivot (count(MONTH_NAME) --max(month_num)
+  for MONTH_NAME in ('Январь'    as "Январь",
+                     'Февраль'   as "Февраль",
+                     'Март'      as "Март",
+                     'Апрель'    as "Апрель",
+                     'Май'       as "Май",
+                     'Июнь'      as "Июнь",
+                     'Июль'      as "Июль",
+                     'Август'    as "Август",
+                     'Сентябрь'  as "Сентябрь",
+                     'Октябрь'   as "Октябрь",
+                     'Ноябрь'    as "Ноябрь",
+                     'Декабрь'   as "Декабрь"))
+where year_num = 2017
+order by year_num, quarter_num 
+
+;--*/
+
+--Год, Квартал, В значениях граф месяцев - номера месяцев
+select * 
+  from (
+        select t.year_num, 
+               t.quarter_num,
+               t.month_num, 
+               t.MONTH_NAME
+          from wb.xxwr_bi_dim_time_v t
+        where t.year_num    is not null and
+              t.quarter_num is not null and
+              t.month_num   is not null and
+              t.week_num    is not null and
+              t.DAY_CODE    is not null
+        )
+pivot (max(month_num)
+  for MONTH_NAME in ('Январь'    as "Январь",
+                     'Февраль'   as "Февраль",
+                     'Март'      as "Март",
+                     'Апрель'    as "Апрель",
+                     'Май'       as "Май",
+                     'Июнь'      as "Июнь",
+                     'Июль'      as "Июль",
+                     'Август'    as "Август",
+                     'Сентябрь'  as "Сентябрь",
+                     'Октябрь'   as "Октябрь",
+                     'Ноябрь'    as "Ноябрь",
+                     'Декабрь'   as "Декабрь"))
+where year_num = 2017
+order by year_num, quarter_num 
+
+;--*/
+
+--Год, месяц, В значениях граф месяцев - номера кварталов
+select * 
+  from (
+        select t.year_num, 
+               t.quarter_num,
+               t.month_num, 
+               t.MONTH_NAME
+          from wb.xxwr_bi_dim_time_v t
+        where t.year_num    is not null and
+              t.quarter_num is not null and
+              t.month_num   is not null and
+              t.week_num    is not null and
+              t.DAY_CODE    is not null
+        )
+pivot (max(quarter_num)--count(MONTH_NAME) --max(month_num)
+  for MONTH_NAME in ('Январь'    as "Январь",
+                     'Февраль'   as "Февраль",
+                     'Март'      as "Март",
+                     'Апрель'    as "Апрель",
+                     'Май'       as "Май",
+                     'Июнь'      as "Июнь",
+                     'Июль'      as "Июль",
+                     'Август'    as "Август",
+                     'Сентябрь'  as "Сентябрь",
+                     'Октябрь'   as "Октябрь",
+                     'Ноябрь'    as "Ноябрь",
+                     'Декабрь'   as "Декабрь"))
+where year_num = 2017
+order by year_num, month_num
